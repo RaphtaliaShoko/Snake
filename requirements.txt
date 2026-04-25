@@ -1,0 +1,5 @@
+# Snake Game Requirements
+# Python 3.10+ required
+
+pygame==2.5.2
+pygame-menu==4.4.5
