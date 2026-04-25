@@ -147,6 +147,35 @@ THEMES: Dict[Theme, GameTheme] = {
         shadow_offset=4,
         particle_count=10
     ),
+    Theme.MODERN: GameTheme(
+        name="Modern",
+        colors=ThemeColors(
+            background=(10, 25, 30),
+            grid_bg=(15, 35, 45),
+            grid_line=(25, 55, 70),
+            snake_head=(20, 200, 180),
+            snake_body=(40, 220, 200),
+            snake_body_alt=(60, 190, 170),
+            food_normal=(255, 140, 80),
+            food_bonus=(255, 220, 100),
+            food_poison=(180, 60, 60),
+            obstacle=(40, 60, 70),
+            text_primary=(200, 230, 220),
+            text_secondary=(120, 160, 150),
+            accent=(20, 220, 190),
+            menu_bg=(12, 30, 38),
+            menu_selected=(25, 55, 70),
+            hud_bg=(15, 40, 50),
+        ),
+        sounds=ThemeSounds(
+            music_tempo=0.9,
+            eat_pitch=1.1,
+            death_pitch=0.7
+        ),
+        corner_radius=2,
+        shadow_offset=6,
+        particle_count=12
+    ),
 }
 
 

@@ -78,3 +78,4 @@ class Theme(Enum):
     CLASSIC = "classic"
     NEON = "neon"
     COLORBLIND = "colorblind"
+    MODERN = "modern"

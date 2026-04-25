@@ -470,3 +470,66 @@ class Renderer:
             surface = pygame.Surface((int(p.size * 2), int(p.size * 2)), pygame.SRCALPHA)
             pygame.draw.circle(surface, color_with_alpha, (int(p.size), int(p.size)), int(p.size))
             self.screen.blit(surface, (p.x - p.size - offset_x, p.y - p.size - offset_y))
+
+    def render_snake_logo(self, center_x: int, center_y: int, size: int = 120) -> None:
+        """Render the modern Snake logo - glowing teal bar with dot."""
+        colors = self.theme.colors
+        teal = colors.accent
+        teal_bright = (min(255, teal[0] + 60), min(255, teal[1] + 60), min(255, teal[2] + 40))
+        teal_dim = (max(0, teal[0] - 40), max(0, teal[1] - 20), max(0, teal[2] - 20))
+        
+        bar_width = size // 8
+        vertical_height = int(size * 0.65)
+        horizontal_width = int(size * 0.45)
+        
+        for glow_pass in range(3, -1, -1):
+            glow_alpha = max(20, 80 - glow_pass * 20)
+            glow_size = bar_width + glow_pass * 8
+            
+            glow_surface = pygame.Surface((bar_width + 24, vertical_height + horizontal_width + 24), pygame.SRCALPHA)
+            
+            pygame.draw.rect(
+                glow_surface,
+                (*teal_dim, glow_alpha),
+                (12, 0, glow_size, vertical_height),
+                border_radius=bar_width // 2
+            )
+            pygame.draw.rect(
+                glow_surface,
+                (*teal_dim, glow_alpha),
+                (12, vertical_height - glow_size // 2, horizontal_width + glow_size // 2, glow_size),
+                border_radius=bar_width // 2
+            )
+            
+            self.screen.blit(glow_surface, (center_x - bar_width // 2 - 12, center_y - vertical_height // 2 - 12))
+        
+        pygame.draw.rect(
+            self.screen,
+            teal,
+            (center_x - bar_width // 2, center_y - vertical_height // 2, bar_width, vertical_height),
+            border_radius=bar_width // 2
+        )
+        
+        pygame.draw.rect(
+            self.screen,
+            teal,
+            (center_x - bar_width // 2, center_y + vertical_height // 2 - horizontal_width // 2 - bar_width // 2, horizontal_width + bar_width // 2, bar_width),
+            border_radius=bar_width // 2
+        )
+        
+        highlight = pygame.Surface((bar_width - 4, vertical_height - 8), pygame.SRCALPHA)
+        for y in range(0, vertical_height - 8, 4):
+            alpha = int(200 * (1 - y / vertical_height))
+            pygame.draw.rect(highlight, (*teal_bright, alpha), (0, y, bar_width - 4, 2))
+        self.screen.blit(highlight, (center_x - bar_width // 2 + 2, center_y - vertical_height // 2 + 4))
+        
+        dot_radius = bar_width // 2 + 2
+        for glow_pass in range(3, -1, -1):
+            glow_alpha = max(30, 100 - glow_pass * 25)
+            glow_radius = dot_radius + glow_pass * 6
+            glow_surf = pygame.Surface((glow_radius * 2, glow_radius * 2), pygame.SRCALPHA)
+            pygame.draw.circle(glow_surf, (*teal_dim, glow_alpha), (glow_radius, glow_radius), glow_radius)
+            self.screen.blit(glow_surf, (center_x - glow_radius, center_y - vertical_height // 2 - dot_radius - 8 - glow_radius))
+        
+        pygame.draw.circle(self.screen, teal, (center_x, center_y - vertical_height // 2 - dot_radius - 8), dot_radius)
+        pygame.draw.circle(self.screen, teal_bright, (center_x - dot_radius // 3, center_y - vertical_height // 2 - dot_radius - 8 - dot_radius // 3), dot_radius // 3)

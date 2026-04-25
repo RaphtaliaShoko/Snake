@@ -3,7 +3,7 @@ Snake Game - Main Module
 
 A modern, feature-rich implementation of the classic Snake game with:
 - Customizable game parameters (grid size, speed, obstacles, etc.)
-- Multiple visual themes (Classic, Neon, Colorblind)
+- Multiple visual themes (Classic, Neon, Colorblind, Modern)
 - Procedural audio (no external files required)
 - High score persistence
 - Gamepad support
