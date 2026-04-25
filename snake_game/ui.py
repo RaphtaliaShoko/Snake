@@ -215,13 +215,7 @@ class UIManager:
 
         menu_items = self._get_main_menu_items()
 
-        self._render_snake_logo(width // 2, height // 4 - 20, size=100, color=teal)
-
-        subtitle = self.get_font("small").render("Modern Arcade Game", True, colors.text_secondary)
-        subtitle_rect = subtitle.get_rect(center=(width // 2, height // 4 + 65))
-        self.screen.blit(subtitle, subtitle_rect)
-
-        start_y = height // 2 + 20
+        start_y = height // 2 - 20
         item_height = 70
 
         for i, item in enumerate(menu_items):
@@ -240,11 +234,6 @@ class UIManager:
             main_text = self.get_font("medium").render(item.text, True, text_color)
             main_rect = main_text.get_rect(center=(width // 2, y))
             self.screen.blit(main_text, main_rect)
-
-            if is_selected and item.subtext:
-                sub = self.get_font("small").render(item.subtext, True, colors.text_secondary)
-                sub_rect = sub.get_rect(center=(width // 2, y + 25))
-                self.screen.blit(sub, sub_rect)
 
         controls = self.get_font("small").render(
             "Arrow Keys/WASD to Navigate | Enter to Select | Esc to Back",

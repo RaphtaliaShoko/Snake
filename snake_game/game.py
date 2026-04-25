@@ -118,10 +118,6 @@ class Game:
 
         if state == GameState.PLAYING and self._previous_state in (GameState.MENU, GameState.GAME_OVER):
             self._start_new_game()
-        elif state == GameState.MENU:
-            self.audio.stop_music()
-        elif state == GameState.PLAYING:
-            self.audio.start_music()
 
     def _start_new_game(self) -> None:
         """Initialize a new game session."""
