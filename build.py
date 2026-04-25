@@ -32,19 +32,18 @@ def check_dependencies():
     """Check if required build tools are installed."""
     print("Checking dependencies...")
     
-    missing = []
+    result = subprocess.run(
+        ["python", "-c", "import pyinstaller; print(pyinstaller.__version__)"],
+        capture_output=True,
+        text=True,
+    )
     
-    try:
-        import pyinstaller
-    except ImportError:
-        missing.append("pyinstaller")
-    
-    if missing:
-        print(f"Missing: {', '.join(missing)}")
+    if result.returncode != 0:
+        print("pyinstaller not found!")
         print("Install with: pip install pyinstaller")
         return False
     
-    print("Dependencies OK")
+    print(f"pyinstaller {result.stdout.strip()} OK")
     return True
 
 
