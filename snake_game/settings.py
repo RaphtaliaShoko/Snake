@@ -28,11 +28,20 @@ class GameSettings:
     enable_obstacles: bool = False
     obstacle_count: int = 5
     difficulty: str = Difficulty.NORMAL.value
-    theme: str = Theme.CLASSIC.value
+    theme: str = Theme.MODERN.value
     music_volume: float = 0.5
     sfx_volume: float = 0.7
     gamepad_enabled: bool = True
     font_scale: float = 1.0
+
+    snake_style: str = "modern"
+    particle_effects: bool = True
+    gradient_intensity: float = 1.0
+    outline_glow: bool = True
+    outline_glow_strength: float = 0.5
+    grid_visible: bool = True
+    colorblind_mode: bool = False
+    vignette: bool = True
 
     def validate(self) -> tuple[bool, Optional[str]]:
         """
@@ -62,6 +71,15 @@ class GameSettings:
 
         if not (0.5 <= self.font_scale <= 2.0):
             return False, "Font scale must be between 0.5 and 2.0"
+
+        if self.snake_style not in ("classic", "modern", "continuous"):
+            return False, "Snake style must be classic, modern, or continuous"
+
+        if not (0 <= self.gradient_intensity <= 1):
+            return False, "Gradient intensity must be between 0 and 1"
+
+        if not (0 <= self.outline_glow_strength <= 1):
+            return False, "Outline/glow strength must be between 0 and 1"
 
         return True, None
 

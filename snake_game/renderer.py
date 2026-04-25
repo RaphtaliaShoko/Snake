@@ -9,6 +9,8 @@ import random
 from .constants import FoodType, SCREEN_WIDTH, SCREEN_HEIGHT, CELL_PADDING
 from .theme import GameTheme, get_theme
 from .constants import Theme
+from .graphics.gradients import get_snake_gradient, create_vignette
+from .graphics.particles import particle_system
 
 
 class Particle:
@@ -202,9 +204,36 @@ class Renderer:
         body: List[Tuple[int, int]],
         cell_size: float,
         direction: Tuple[int, int],
+        animation_offset: float = 0.0,
+        style: str = "modern"
+    ) -> None:
+        """Render the snake onto a grid surface.
+        
+        Args:
+            grid_surface: Surface to render on
+            body: List of (row, col) positions
+            cell_size: Size of each grid cell
+            direction: Current direction (dx, dy)
+            animation_offset: Movement interpolation (0.0 to 1.0)
+            style: "modern" for continuous gradient, "classic" for blocky
+        """
+        colors = self.theme.colors
+        radius = self.theme.corner_radius
+
+        if style == "modern" or style == "continuous":
+            self._render_snake_modern(grid_surface, body, cell_size, direction, animation_offset)
+        else:
+            self._render_snake_classic(grid_surface, body, cell_size, direction, animation_offset)
+
+    def _render_snake_classic(
+        self,
+        grid_surface: pygame.Surface,
+        body: List[Tuple[int, int]],
+        cell_size: float,
+        direction: Tuple[int, int],
         animation_offset: float = 0.0
     ) -> None:
-        """Render the snake onto a grid surface."""
+        """Render snake as discrete blocks (classic style)."""
         colors = self.theme.colors
         radius = self.theme.corner_radius
 
@@ -233,27 +262,163 @@ class Renderer:
             pygame.draw.rect(grid_surface, color, rect, border_radius=radius)
 
             if i == 0:
-                eye_size = max(3, size * 0.15)
-                eye_offset = size * 0.25
+                self._render_snake_eyes(grid_surface, x + offset_x, y + offset_y, size, direction)
 
-                center_x = x + size / 2 + offset_x
-                center_y = y + size / 2 + offset_y
+    def _render_snake_eyes(
+        self,
+        grid_surface: pygame.Surface,
+        x: float,
+        y: float,
+        size: float,
+        direction: Tuple[int, int]
+    ) -> None:
+        """Render eyes on the snake head."""
+        eye_size = max(3, size * 0.15)
+        eye_offset = size * 0.25
+        center_x = x + size / 2
+        center_y = y + size / 2
 
-                if direction == (1, 0):
-                    eye1 = (center_x + eye_offset - eye_size / 2, center_y - eye_offset)
-                    eye2 = (center_x + eye_offset - eye_size / 2, center_y + eye_offset)
-                elif direction == (-1, 0):
-                    eye1 = (center_x - eye_offset - eye_size / 2, center_y - eye_offset)
-                    eye2 = (center_x - eye_offset - eye_size / 2, center_y + eye_offset)
-                elif direction == (0, -1):
-                    eye1 = (center_x - eye_offset, center_y - eye_offset - eye_size / 2)
-                    eye2 = (center_x + eye_offset, center_y - eye_offset - eye_size / 2)
-                else:
-                    eye1 = (center_x - eye_offset, center_y + eye_offset - eye_size / 2)
-                    eye2 = (center_x + eye_offset, center_y + eye_offset - eye_size / 2)
+        # Eye positions based on direction
+        if direction == (1, 0):
+            eye1 = (center_x + eye_offset - eye_size / 2, center_y - eye_offset)
+            eye2 = (center_x + eye_offset - eye_size / 2, center_y + eye_offset)
+        elif direction == (-1, 0):
+            eye1 = (center_x - eye_offset - eye_size / 2, center_y - eye_offset)
+            eye2 = (center_x - eye_offset - eye_size / 2, center_y + eye_offset)
+        elif direction == (0, -1):
+            eye1 = (center_x - eye_offset, center_y - eye_offset - eye_size / 2)
+            eye2 = (center_x + eye_offset, center_y - eye_offset - eye_size / 2)
+        else:
+            eye1 = (center_x - eye_offset, center_y + eye_offset - eye_size / 2)
+            eye2 = (center_x + eye_offset, center_y + eye_offset - eye_size / 2)
 
-                pygame.draw.circle(grid_surface, (255, 255, 255), eye1, int(eye_size))
-                pygame.draw.circle(grid_surface, (255, 255, 255), eye2, int(eye_size))
+        pygame.draw.circle(grid_surface, (255, 255, 255), (int(eye1[0]), int(eye1[1])), int(eye_size))
+        pygame.draw.circle(grid_surface, (255, 255, 255), (int(eye2[0]), int(eye2[1])), int(eye_size))
+
+    def _render_snake_head_modern(
+        self,
+        grid_surface: pygame.Surface,
+        x: float,
+        y: float,
+        radius: float,
+        direction: Tuple[int, int]
+    ) -> None:
+        """Render the snake head with eyes for modern style."""
+        color = self.theme.colors.snake_head
+        pygame.draw.circle(grid_surface, color, (int(x), int(y)), int(radius))
+
+        highlight_radius = radius * 0.3
+        highlight_offset = -radius * 0.3
+        highlight_color = (233, 196, 106)
+        pygame.draw.circle(grid_surface, highlight_color, (int(x + highlight_offset), int(y + highlight_offset)), int(highlight_radius))
+
+        eye_size = max(2, radius * 0.15)
+        eye_offset = radius * 0.3
+        dark_color = (38, 70, 83)
+
+        if direction == (1, 0):
+            eye1 = (int(x + eye_offset), int(y - eye_offset))
+            eye2 = (int(x + eye_offset), int(y + eye_offset))
+        elif direction == (-1, 0):
+            eye1 = (int(x - eye_offset), int(y - eye_offset))
+            eye2 = (int(x - eye_offset), int(y + eye_offset))
+        elif direction == (0, -1):
+            eye1 = (int(x - eye_offset), int(y - eye_offset))
+            eye2 = (int(x + eye_offset), int(y - eye_offset))
+        else:
+            eye1 = (int(x - eye_offset), int(y + eye_offset))
+            eye2 = (int(x + eye_offset), int(y + eye_offset))
+
+        pygame.draw.circle(grid_surface, dark_color, eye1, int(eye_size))
+        pygame.draw.circle(grid_surface, dark_color, eye2, int(eye_size))
+
+    def _render_snake_modern(
+        self,
+        grid_surface: pygame.Surface,
+        body: List[Tuple[int, int]],
+        cell_size: float,
+        direction: Tuple[int, int],
+        animation_offset: float = 0.0
+    ) -> None:
+        """Render snake as continuous tube with gradient."""
+        colors = self.theme.colors
+
+        if len(body) < 2:
+            if len(body) == 1:
+                row, col = body[0]
+                x = col * cell_size + cell_size / 2 + CELL_PADDING
+                y = row * cell_size + cell_size / 2 + CELL_PADDING
+                size = cell_size - CELL_PADDING * 2
+                pygame.draw.circle(grid_surface, colors.snake_head, (int(x), int(y)), int(size // 2))
+            return
+
+        points = []
+        for row, col in body:
+            x = col * cell_size + cell_size / 2 + CELL_PADDING
+            y = row * cell_size + cell_size / 2 + CELL_PADDING
+            points.append((x, y))
+
+        if animation_offset > 0 and len(points) > 1:
+            dx = direction[0] * animation_offset * cell_size * 0.3
+            dy = direction[1] * animation_offset * cell_size * 0.3
+            points[0] = (points[0][0] + dx, points[0][1] + dy)
+
+        segment_radius = (cell_size - CELL_PADDING * 2) / 2
+
+        gradient_colors = [
+            colors.snake_head,
+            colors.snake_body,
+            colors.snake_body_alt,
+        ]
+
+        for i in range(len(points) - 1):
+            p1 = points[i]
+            p2 = points[i + 1]
+            color_idx = min(i, len(gradient_colors) - 1)
+            color = gradient_colors[color_idx]
+            self._draw_capsule_simple(grid_surface, p1, p2, segment_radius, color)
+
+        for i, p in enumerate(points):
+            color_idx = min(i, len(gradient_colors) - 1)
+            color = gradient_colors[color_idx]
+            pygame.draw.circle(grid_surface, color, (int(p[0]), int(p[1])), int(segment_radius))
+
+        if len(points) > 0:
+            head_x, head_y = points[0]
+            self._render_snake_head_modern(grid_surface, head_x, head_y, segment_radius, direction)
+
+    def _draw_capsule_simple(
+        self,
+        surface: pygame.Surface,
+        p1: Tuple[float, float],
+        p2: Tuple[float, float],
+        radius: float,
+        color: Tuple[int, int, int]
+    ) -> None:
+        """Draw a capsule connecting two points."""
+        x1, y1 = p1
+        x2, y2 = p2
+
+        dx = x2 - x1
+        dy = y2 - y1
+        length = (dx * dx + dy * dy) ** 0.5
+        if length < 0.1:
+            return
+
+        nx = -dy / length * radius
+        ny = dx / length * radius
+
+        points = [
+            (int(x1 + nx), int(y1 + ny)),
+            (int(x2 + nx), int(y2 + ny)),
+            (int(x2 - nx), int(y2 - ny)),
+            (int(x1 - nx), int(y1 - ny)),
+        ]
+
+        pygame.draw.polygon(surface, color, points)
+
+        pygame.draw.circle(surface, color, (int(x1), int(y1)), int(radius))
+        pygame.draw.circle(surface, color, (int(x2), int(y2)), int(radius))
 
     def render_food(
         self,

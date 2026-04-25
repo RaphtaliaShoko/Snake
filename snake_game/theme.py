@@ -6,6 +6,23 @@ from dataclasses import dataclass
 from .constants import Theme
 
 
+MODERN_PALETTE = {
+    "deep_teal": (38, 70, 83),
+    "teal": (42, 157, 143),
+    "warm_yellow": (233, 196, 106),
+    "warm_orange": (244, 162, 97),
+    "coral": (231, 111, 81),
+}
+
+MODERN_PALETTE_CB = {
+    "deep_teal": (38, 70, 83),
+    "teal": (42, 157, 143),
+    "warm_yellow": (244, 162, 97),
+    "warm_orange": (42, 157, 143),
+    "coral": (231, 111, 81),
+}
+
+
 @dataclass
 class ThemeColors:
     """Color palette for a theme."""
@@ -150,29 +167,29 @@ THEMES: Dict[Theme, GameTheme] = {
     Theme.MODERN: GameTheme(
         name="Modern",
         colors=ThemeColors(
-            background=(10, 25, 30),
-            grid_bg=(15, 35, 45),
-            grid_line=(25, 55, 70),
-            snake_head=(20, 200, 180),
-            snake_body=(40, 220, 200),
-            snake_body_alt=(60, 190, 170),
-            food_normal=(255, 140, 80),
-            food_bonus=(255, 220, 100),
-            food_poison=(180, 60, 60),
-            obstacle=(40, 60, 70),
-            text_primary=(200, 230, 220),
-            text_secondary=(120, 160, 150),
-            accent=(20, 220, 190),
-            menu_bg=(12, 30, 38),
-            menu_selected=(25, 55, 70),
-            hud_bg=(15, 40, 50),
+            background=MODERN_PALETTE["deep_teal"],
+            grid_bg=(51, 90, 100),
+            grid_line=(60, 100, 115),
+            snake_head=MODERN_PALETTE["teal"],
+            snake_body=MODERN_PALETTE["warm_orange"],
+            snake_body_alt=MODERN_PALETTE["coral"],
+            food_normal=MODERN_PALETTE["warm_yellow"],
+            food_bonus=MODERN_PALETTE["warm_orange"],
+            food_poison=MODERN_PALETTE["coral"],
+            obstacle=(55, 80, 95),
+            text_primary=MODERN_PALETTE["warm_yellow"],
+            text_secondary=(150, 180, 170),
+            accent=MODERN_PALETTE["teal"],
+            menu_bg=(30, 55, 65),
+            menu_selected=(45, 80, 90),
+            hud_bg=(38, 70, 83, 191),
         ),
         sounds=ThemeSounds(
             music_tempo=0.9,
             eat_pitch=1.1,
             death_pitch=0.7
         ),
-        corner_radius=2,
+        corner_radius=4,
         shadow_offset=6,
         particle_count=12
     ),
@@ -182,3 +199,10 @@ THEMES: Dict[Theme, GameTheme] = {
 def get_theme(theme_type: Theme) -> GameTheme:
     """Get the theme for the given theme type."""
     return THEMES.get(theme_type, THEMES[Theme.CLASSIC])
+
+
+def get_palette(theme_type: Theme = Theme.MODERN, colorblind: bool = False) -> Dict[str, Tuple[int, int, int]]:
+    """Get the color palette for the given theme."""
+    if colorblind:
+        return MODERN_PALETTE_CB
+    return MODERN_PALETTE
