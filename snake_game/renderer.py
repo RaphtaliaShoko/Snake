@@ -362,7 +362,7 @@ class Renderer:
         if paused:
             texts.append("PAUSED")
 
-        total_width = sum(font.size(t + "  ") for t in texts)
+        total_width = sum(font.size(t + "  ")[0] for t in texts)
         spacing = hud_rect.width / (len(texts) + 1)
 
         for i, text in enumerate(texts):
