@@ -6,7 +6,8 @@ A modern, feature-rich implementation of the classic Snake arcade game written i
 
 - **Customizable Gameplay**: Adjust grid size, speed, obstacles, and more
 - **Multiple Food Types**: Normal, bonus, and poison food with different effects
-- **Visual Themes**: Classic, Neon, and Colorblind-friendly themes
+- **Visual Themes**: Classic, Neon, Colorblind, and Modern (default) themes
+- **Modern Graphics**: Smooth continuous snake with gradient, particle effects, vignette
 - **Procedural Audio**: No external files needed - all sounds generated in code
 - **High Score Persistence**: Save and track your best scores across sessions
 - **Gamepad Support**: Play with keyboard or a connected gamepad
@@ -75,7 +76,12 @@ python -m snake_game.run
 - **Hard**: Larger grid, faster speed, obstacles
 
 ### Visual Options
-- **Theme**: Classic, Neon, Colorblind
+- **Theme**: Classic, Neon, Colorblind, **Modern (default)**
+- **Snake Style**: Modern (continuous gradient) or Classic (blocky)
+- **Particle Effects**: On/Off
+- **Grid Visibility**: On/Off
+- **Outline/Glow**: On/Off
+- **Colorblind Mode**: On/Off (remaps colors for accessibility)
 - **Font Scale**: 0.5x - 2.0x
 - **Music Volume**: 0-100%
 - **SFX Volume**: 0-100%
@@ -97,17 +103,32 @@ snake_game/
 ├── persistence.py       # High scores and stats
 ├── ui.py                # Menu and interface management
 ├── game.py              # Main game logic
+├── graphics/            # Graphics utilities (new)
+│   ├── gradients.py     # Gradient generation
+│   └── particles.py     # Particle system
 └── tests/
     └── test_core.py     # Unit tests
 ```
 
 ## Food Types
 
-| Type | Color | Effect | Points |
-|------|-------|--------|--------|
-| Normal | Red | Grow +1 | 10 |
-| Bonus | Gold | Grow +2 | 50 |
-| Poison | Purple | Shrink -1 | -20 |
+| Type | Color (Classic) | Color (Modern) | Effect | Points |
+|------|-----------------|----------------|--------|--------|
+| Normal | Red | Gold (#E9C46A) | Grow +1 | 10 |
+| Bonus | Gold | Orange (#F4A261) | Grow +2 | 50 |
+| Poison | Purple | Coral (#E76F51) | Shrink -1 | -20 |
+
+## Modern Theme Palette
+
+The default Modern theme uses a cohesive color palette:
+
+| Element | Color | Hex |
+|---------|-------|-----|
+| Background | Deep Teal | #264653 |
+| Accent (snake head) | Teal | #2A9D8F |
+| Highlight | Warm Yellow | #E9C46A |
+| Snake Body | Orange | #F4A261 |
+| Snake Tail | Coral | #E76F51 |
 
 ## File Locations
 
@@ -127,9 +148,10 @@ Execute the test suite:
 python -m pytest snake_game/tests/test_core.py
 ```
 
-Or run the verification script:
+Or run the verification scripts:
 ```bash
-python verify_run.py
+python verify_run.py          # Core game verification
+python verify_graphics_upgrade.py  # Graphics features verification
 ```
 
 ## Extending the Game
@@ -192,6 +214,7 @@ class Theme(Enum):
     CLASSIC = "classic"
     NEON = "neon"
     COLORBLIND = "colorblind"
+    MODERN = "modern"
     NEW_THEME = "new_theme"  # Add here
 ```
 
